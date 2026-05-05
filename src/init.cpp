@@ -17,6 +17,6 @@ void InitList(hashtable_type* hashtable)
     hashtable->hash_table = data;
     hashtable->num_of_words = 0;
     hashtable->size = INITIAL_SIZE;
-    hashtable->func = crc32Optimized;
+    hashtable->func = CRC32ASM;
 
 }

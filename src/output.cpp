@@ -1,5 +1,5 @@
 #include "output.h"
-#include <cstdlib>
+
 bool FillFileWithWords(FILE* output_file, char* buf, int bufsize) //bufsize это типа не считая \0, то, что возвращает GetSizeOfInputFile
 {
     assert(output_file);
@@ -34,7 +34,7 @@ void SkipNotLeller(char* buf, int *i)
     assert(buf);
     assert(i);
 
-    while (!isalpha(buf[*i])) //!((65 <= buf[*i] <= 90) || (97 <= buf[*i] <= 122))
+    while (!isalpha(buf[*i])) 
         (*i) += 1;
 }
 
@@ -62,18 +62,20 @@ void CSVoutput(hashtable_type* hashtable)
     fclose(filee);
 }
 
-void DumpHT(hashtable_type* hashtable)
+void DumpHT(hashtable_type* hashtable, long long int time)
 {
-    FILE* dump_file = fopen("files/hashtable_info.", "w");
+    FILE* dump_file = fopen(NAME_OF_INFO_FILE, "w");
 
     float variance = CountVariance(hashtable);
     float loadfactor = CountLoadFactor(hashtable);
+    fprintf(stderr, "%ld\n", time);
 
     fprintf(dump_file,  "----------------------------------------\n"
                         "load factor: %f\n"
                         "variance: %f\n"
+                        "CPU cycles: %lld\n"
                         "----------------------------------------\n", 
-                        loadfactor, variance);
+                        loadfactor, variance, time);
 
     for (int i = 0; i < hashtable->size; i++)
     {
@@ -106,11 +108,9 @@ float CountVariance(hashtable_type* hashtable)
             current_el = current_el->next_elem;
         }
 
-        // sum2 += backet_size * backet_size;
         variance += (loadfactor - (float) backet_size) * (loadfactor - (float) backet_size);
     }
 
-    // variance = sum2 / hashtable->num_of_words - loadfactor * loadfactor;
     variance /= hashtable->num_of_words;
 
     return variance;

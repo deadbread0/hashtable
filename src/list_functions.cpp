@@ -1,10 +1,8 @@
 #include "list_functions.h"
-#include <cstring>
-#include <ctype.h>
 
-extern "C" int MyOwnStrncmp(char* word1, char* word2);
+extern "C" int MyOwnStrcmp(char* word1, char* word2);
 
-void FillHashTable(hashtable_type* hashtable, char* word, unsigned int hashnum) //возвращает 1, если слово было добавлено в хт
+void FillHashTable(hashtable_type* hashtable, char* word, unsigned int hashnum) 
 {
     assert(hashtable != nullptr);
     assert(word != nullptr);
@@ -17,7 +15,7 @@ void FillHashTable(hashtable_type* hashtable, char* word, unsigned int hashnum) 
         hashtable_el_type* prev_el = &hashtable->hash_table[index];
         int flag = 0;
         
-        while (current_el) //current_el->next
+        while (current_el) 
         {
             if (!MyStrcmp(word, current_el->word))
                 return;
@@ -39,7 +37,7 @@ void FillHashTable(hashtable_type* hashtable, char* word, unsigned int hashnum) 
             return;
         }
 
-        hashtable->hash_table[index].next_elem = new_elem; //current_el->next_elem
+        hashtable->hash_table[index].next_elem = new_elem; 
         return;
         
     } 
@@ -47,25 +45,9 @@ void FillHashTable(hashtable_type* hashtable, char* word, unsigned int hashnum) 
     hashtable->num_of_words++;
     hashtable->hash_table[index].hash_num = hashnum;
     hashtable->hash_table[index].next_elem = nullptr;
-    memcpy(&(hashtable->hash_table[index].word), word, strlen(word)); //попробовать 32
+    memcpy(&(hashtable->hash_table[index].word), word, strlen(word)); 
 }
 
-
-void DestroyTable(hashtable_type* hashtable)
-{
-    for (int i = 0; i < hashtable->size; i++)
-    {
-        hashtable_el_type* current_el = hashtable->hash_table[i].next_elem;
-        hashtable_el_type* prev_el = hashtable->hash_table[i].next_elem;
-        while (current_el)
-        {
-            prev_el = current_el;
-            current_el = current_el->next_elem;
-            free(prev_el);
-        }
-    }
-    free(hashtable->hash_table);
-}
 
 int FindSomeElementsInTable(hashtable_type* hashtable, char** words)
 {
@@ -89,11 +71,7 @@ hashtable_el_type* FindOneElInTable(hashtable_type* hashtable, char* word)
 
     while (current_el) 
     {
-        // fprintf(stderr, "%s %s\n", word, current_el->word);
-        if (current_el->word == nullptr) 
-            printf("DEBUG: Found NULL pointer in FindOneElInTable\n");
-       
-        if (!MyStrcmp(word, current_el->word)) //нет доступа к этой памяти
+        if (!MyStrcmp(word, current_el->word)) 
             return current_el;
 
         current_el = current_el->next_elem;
@@ -132,24 +110,11 @@ int MyStrcmp(char* word1, char* word2)
 {
     int result = 0;
 
-//     Program received signal SIGSEGV, Segmentation fault.
-// 0x000000000040232d in MyStrcmp (word2=0x6c000000000057bb <error: Cannot access memory at address 0x6c000000000057bb>, word1=0x5aad30 "Potter")
-//     at list_functions.cpp:149
-
-// причем в функции FillHashTable уже используется MyStrcmp раньше, проходится по тем же элементам, а тут что-то идет не так..
-
-// ==24730== LEAK SUMMARY: это на момент сегфолта
-// ==24730==    definitely lost: 0 bytes in 0 blocks
-// ==24730==    indirectly lost: 0 bytes in 0 blocks
-// ==24730==      possibly lost: 0 bytes in 0 blocks
-// ==24730==    still reachable: 10,015,995 bytes in 58,203 blocks
-// ==24730==         suppressed: 0 bytes in 0 blocks
-
-
 __asm__ 
 (
     ".intel_syntax noprefix\n\t"
 
+    "xor rax, rax\n\t"
     "vmovups ymm0, [%1]\n\t"   
     "vmovups ymm1, [%2]\n\t"      
     "vptest  ymm0, ymm1\n\t"      
@@ -157,10 +122,12 @@ __asm__
     "mov %0, eax\n\t"
 
     ".att_syntax prefix\n\t"
-    :"+&r"(result)                     // список выходных параметров.
-    :"r"(word1), "r"(word2)              // список входных параметров.
-    :"ymm0", "ymm1"                      // список разрушаемых регистров.
+    :"+&r"(result)                     //список выходных параметров.
+    :"r"(word1), "r"(word2)            //список входных параметров.
+    :"ymm0", "ymm1", "rax"             //список разрушаемых регистров.
 );
+
 return result;
 }
+
 

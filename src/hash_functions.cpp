@@ -1,8 +1,4 @@
 #include "hash_functions.h"
-#include <immintrin.h>
-#pragma GCC push_options
-#pragma GCC target("avx2")
-#pragma GCC target("avx")
 
 unsigned int Return0(char* word)
 {
@@ -80,10 +76,10 @@ unsigned int crc32(char* word)
 unsigned int crc32Optimized(char* word)
 {
     assert(word != nullptr);
-    uint64_t crc = 0xffffffff;
+    uint32_t crc = 0xffffffff;
 
     for (int i = 0; i < MAX_LEN_OF_WORD / 8; i++)
-        crc = _mm_crc32_u64(crc, *((uint64_t*)word + i)); //0-7 символы
+        crc = _mm_crc32_u64(crc, *((uint64_t*)word + i)); //j - (j+7) символы
 
-    return (uint32_t)crc;
+    return crc;
 }

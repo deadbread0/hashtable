@@ -49,3 +49,16 @@ void InputFromFile(const char* filee_name, hashtable_type* hashtable)
 
 }
 
+void GetWordsFromFile(int input_file_size, char* buf)
+{
+    FILE* output_file = fopen(NAME_OF_OUTPUT_FILE, "w");
+    FILE* input_file = fopen(NAME_OF_BIG_INPUT_FILE, "r");
+
+    ReadText(input_file, buf, input_file_size);
+
+    FillFileWithWords(output_file, buf, input_file_size); 
+
+    fclose(output_file);
+    fclose(input_file);
+}
+
