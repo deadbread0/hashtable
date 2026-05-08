@@ -227,9 +227,10 @@ __asm__
 
     "xor rax, rax\n\t"
     "vmovups ymm0, [%1]\n\t"   
-    "vmovups ymm1, [%2]\n\t"      
-    "vptest  ymm0, ymm1\n\t"      
-    "setnb al\n\t"
+    "vmovups ymm1, [%2]\n\t"  
+    "vpxor ymm2, ymm0, ymm1\n\t"     
+    "vptest  ymm2, ymm2\n\t"      
+    "setnz al\n\t"
     "mov %0, eax\n\t"
 
     ".att_syntax prefix\n\t"
