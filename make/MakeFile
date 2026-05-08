@@ -1,0 +1,2 @@
+all:
+	g++ -no-pie src/main.cpp src/input.cpp src/init.cpp src/output.cpp src/hash_functions.cpp src/list_functions.cpp src/free_memory.cpp src/my_own_crc32.o -I include -g -o exe/program.exe -O3 
